@@ -7,7 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "board.hpp"
+#include "game.hpp"
 
+using namespace std;
 
 class Shape
 {
@@ -21,7 +23,11 @@ class Shape
         Shape();
         Shape(SDL_Color _col, bool _mat[4][4], double x, double y, int size);
         bool isBlock(Shape shape, int x, int y);
-        void moveShape();
+        void moveShape(Shape *shape, string position);
+        void rotateShape(Shape *shape);
+        void renderShape(Shape currShape, SDL_Renderer *renderer);
+        void renderNextShape(Shape nextShape, SDL_Renderer *renderer);
+        void saveShape(Gamedata *data, Shape currShape, SDL_Renderer *renderer, int &score);
 };
 
 bool shape1[4][4] = {0, 0, 1, 0,          // L

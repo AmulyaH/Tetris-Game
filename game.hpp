@@ -24,8 +24,10 @@ struct Gamedata
 class Game
 {
 private:
-    Game(const Game &);
-    Game &operator=(const Game &);
+    //Game(const Game &);
+    //Game &operator=(const Game &);
+    SDL_Window *_window = NULL;
+    SDL_Renderer *_renderer = NULL;
     int _boardWidth = DIM * BOARDWIDTH;
     int _boardHeight = DIM * BOARDHEIGHT;
     int _level;
@@ -33,6 +35,8 @@ private:
     bool _isRunning = true;
     bool _isPaused = false;
     bool _isGameOver = false;
+    int _currentTimeTick = 0;
+    int _lastTimeTick = 0;
     Gamedata _data;
 
     Shape _currentShape;
@@ -44,7 +48,9 @@ public:
     bool gameRunning();
 
     bool isCollision(Gamedata _data, Shape _currentShape);
-   
+    void renderScore(SDL_Renderer *renderer, int score);
+    void rencderLevel(SDL_Renderer *renderer, int level);
+    void renderText(SDL_Renderer *renderer, const char *text, int x, int y, int width, int height, SDL_Color color);
 };
 
   

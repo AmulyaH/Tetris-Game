@@ -280,30 +280,6 @@ bool isBlock(Shape current_shape, int x, int y)
     return current_shape.matrix[x][y];
 }
 
-bool isValidCollision(Gamedata data, Shape shape)
-{
-    for (int x = 0; x < current_shape.size; ++x)
-    {
-        for (int y = 0; y < current_shape.size; ++y)
-        {
-            if (isBlock(current_shape, x, y))
-            {
-                int wx = current_shape.x + x;
-                int wy = current_shape.y + y;
-                if (wy < 0 || wy >= BOARDHEIGHT)
-                {
-                    return true;
-                }
-                if (data.board[wy][wx].isFilled)
-                {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
 bool isCollision(Gamedata data, Shape current_shape)
 {
     for (int x = 0; x < current_shape.size; ++x)
