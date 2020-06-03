@@ -4,7 +4,6 @@
 
 using namespace std;
 
-
 // construtor to initialize the shape with details of color, offset values, size
 Shape::Shape(SDL_Color color, bool matrix[4][4], double x, double y, int size) : 
             _color{color}, _matrix{matrix}, _offsetX{x}, _offsetY{y}, _size{size}
