@@ -1,97 +1,124 @@
-
 #include "shape.hpp"
 #include <string>
 #include <iostream>
 
 using namespace std;
 
-Shape::Shape(SDL_Color color, bool matrix[4][4], double x, double y, int size): 
-                            _color{color}, _matrix{matrix}, _x{x},  _y{y},  _size{size}{
-                                for (int row = 0; row < 4; row++)
-                                {
-                                    for (int col = 0; col < 4; col++)
-                                    {
-                                        _matrix[row][col] = matrix[row][col];
-                                    }
-                                    
-                                }
-                                
-                            };
 
-
-bool Shape::isBlock(Shape currShape, int x , int y)
+// construtor to initialize the shape with details of color, offset values, size
+Shape::Shape(SDL_Color color, bool matrix[4][4], double x, double y, int size) : 
+            _color{color}, _matrix{matrix}, _offsetX{x}, _offsetY{y}, _size{size}
 {
-    return currShape._matrix[x][y];
-}
-
-void Shape::moveShape(Shape *currShape, string position)
-{
-    if (position == "down")
-        currShape->_y++;
-
-    if (position == "left")
-        currShape->_x--;
-
-    if (position == "right")
-        currShape->_x++;
-}
-
- void Shape::rotateShape(Shape *currShape)
- {
-    Shape temp = *currShape;
-    for (int i = 0; i < temp._size; i++)
+    for (int row = 0; row < 4; row++)
     {
-        for (int j = 0; j < temp._size; j++)
+        for (int col = 0; col < 4; col++)
         {
-            currShape->_matrix[i][j] = temp._matrix[j][i];
+            _matrix[row][col] = matrix[row][col];
+        }
+    }
+};
+
+/**
+ * to check if the boack is filled for the given row and col position in a shape matrix
+ * @param currentShape current shape
+ * @param row row number in shape matrix
+ * @param col column number in shape matrix
+ * @return bool value true/false
+ */ 
+bool Shape::isBlock(Shape currentShape, int row, int col)
+{
+    return currentShape._matrix[row][col];
+}
+
+/**
+ * to move the shapes to left, right and down based on the key press on keyboard
+ * @param currentShape current shape
+ * @param direction the direction movement has to be done 
+ */ 
+void Shape::moveShape(Shape *currentShape, string direction)
+{
+    if (direction == "down")
+        currentShape->_offsetY++;
+
+    if (direction == "left")
+        currentShape->_offsetX--;
+
+    if (direction == "right")
+        currentShape->_offsetX++;
+}
+
+/**
+ * rotate the shape on press on page up key
+ * @param currentShape the current shape which has to be rotated
+ */ 
+void Shape::rotateShape(Shape *currentShape)
+{
+    // doing the transpose of the shape
+    Shape temp = *currentShape;
+    for (int row = 0; row < temp._size; row++)
+    {
+        for (int col = 0; col < temp._size; col++)
+        {
+            currentShape->_matrix[row][col] = temp._matrix[col][row];
         }
     }
 
-    temp = *currShape;
-    for (int i = 0; i < temp._size; i++)
+    // changing the columns
+    temp = *currentShape;
+    for (int row = 0; row < temp._size; row++)
     {
-        for (int j = 0; j < temp._size / 2; j++)
+        for (int col = 0; col < temp._size / 2; col++)
         {
-            bool t = temp._matrix[i][j];
-            currShape->_matrix[i][j] = temp._matrix[i][temp._size - j - 1];
-            currShape->_matrix[i][temp._size - j - 1] = t;
+            bool isTrue = temp._matrix[row][col];
+            currentShape->_matrix[row][col] = temp._matrix[row][temp._size - col - 1];
+            currentShape->_matrix[row][temp._size - col - 1] = isTrue;
         }
     }
- }
+}
 
- void Shape::renderShape(Shape currShape, SDL_Renderer *renderer)
- {
-     SDL_Rect rect;
-     for (int i = 0; i < currShape._size; i++)
+/**
+ * render shape and dispaly on board
+ * @param currentShape the shape which has to be rendered
+ * @param renderer SDL renderer to render shape
+ */
+void Shape::renderShape(Shape currentShape, SDL_Renderer *renderer)
+{
+    SDL_Rect rect;
+    for (int i = 0; i < currentShape._size; i++)
     {
-        for (int j = 0; j < currShape._size; j++)
+        for (int j = 0; j < currentShape._size; j++)
         {
-            if (currShape._matrix[i][j])
+            if (currentShape._matrix[i][j])
             {
-                rect.x = (currShape._x + i) * DIM;
-                rect.y = (currShape._y + j) * DIM;
+                rect.x = (currentShape._offsetX + i) * DIM;
+                rect.y = (currentShape._offsetY + j) * DIM;
                 rect.w = DIM;
                 rect.h = DIM;
-                SDL_SetRenderDrawColor(renderer, currShape._color.r, currShape._color.g, currShape._color.b, 255);
+                SDL_SetRenderDrawColor(renderer, currentShape._color.r, currentShape._color.g, currentShape._color.b, currentShape._color.a);
                 SDL_RenderFillRect(renderer, &rect);
                 SDL_SetRenderDrawColor(renderer, 255, 219, 219, 255);
                 SDL_RenderDrawRect(renderer, &rect);
             }
         }
     }
- }
+}
 
- void Shape::renderNextShape(Shape nextShape, SDL_Renderer *renderer)
- {
-     SDL_Rect rect;
-     for (int i = 0; i < nextShape._size; i++)
+/**
+ * render the next droping shape and display on board
+ * @param nextShape the next shape which which will show up on board and has to be rendered
+ * @param renderer SDL renderer to render shape
+ */ 
+void Shape::renderNextShape(Shape nextShape, SDL_Renderer *renderer)
+{
+    SDL_Rect rect;
+    for (int i = 0; i < nextShape._size; i++)
     {
         for (int j = 0; j < nextShape._size; j++)
         {
             if (nextShape._matrix[i][j])
             {
                 rect.x = (13 + i) * DIM;
-                rect.y = (12 + j) * DIM;
+                rect.y = (16 + j) * DIM;
                 rect.w = DIM;
                 rect.h = DIM;
 
@@ -102,20 +129,27 @@ void Shape::moveShape(Shape *currShape, string position)
             }
         }
     }
- }
+}
 
- void Shape::saveShape(Gamedata *data, Shape current_shape, SDL_Renderer *renderer, int &score)
- {
-     for (auto x = 0; x < current_shape._size; ++x)
+/**
+ * save the shape in the board and clear the line if all the columns in a row is filled 
+ * @param data gamedata which has the info of which all blocks of the board is filled with shapes
+ * @param currentShape the current shape which has to be saved on board
+ * @param renderer SDL rederer to render and save the shape on board
+ * @param score the score will be updated with + 10 when each row / line gets clear
+ */ 
+void Shape::saveShape(Gamedata *data, Shape currentShape, SDL_Renderer *renderer, int &score)
+{
+    for (auto x = 0; x < currentShape._size; ++x)
     {
-        for (auto y = 0; y < current_shape._size; ++y)
+        for (auto y = 0; y < currentShape._size; ++y)
         {
-            if (current_shape.isBlock(current_shape, x, y))
+            if (currentShape.isBlock(currentShape, x, y))
             {
-                int wx = current_shape._x + x;
-                int wy = current_shape._y + y;
+                int wx = currentShape._offsetX + x;
+                int wy = currentShape._offsetY + y;
                 data->board[wy][wx].isFilled = true;
-                data->board[wy][wx].color = current_shape._color;
+                data->board[wy][wx].color = currentShape._color;
             }
         }
     }
@@ -139,6 +173,4 @@ void Shape::moveShape(Shape *currShape, string position)
             score += 10;
         }
     }
- }
-
- 
+}

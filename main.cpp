@@ -13,10 +13,8 @@ using namespace std;
 
 int main(int argc, char **args)
 {
-    //Gamedata g;
-    
     Game game;
-    //bool _isRunning ;
-    while (game.gameRunning());
+    // looping through till game gets over or user choose to close the game or exit by pressing escape button
+    while (game.gameRunning()); 
     return 0;
 }

@@ -3,87 +3,44 @@
 #include <SDL2/SDL_ttf.h>
 #include <string>
 #include "board.hpp"
-//#include "game.hpp"
-/*
-#include <iostream>
-#include <vector>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include "board.hpp"
- */
 
 using namespace std;
 
+/**
+ * Shape class which initialize the shapes, move shapes and save shapes in board
+ */ 
 class Shape
 {
      public:
-        SDL_Color _color;
+        SDL_Color _color; // to set the color of the shape
         bool _matrix[4][4];
-        double _x, _y;
+        double _offsetX, _offsetY;
         int _size;
 
 
     public:
         Shape() = default;
         Shape(SDL_Color _col, bool _mat[4][4], double x, double y, int size);
-        bool isBlock(Shape shape, int x, int y);
+
+        // to check if the boack is filled for the given row and col position in a shape matrix
+        bool isBlock(Shape shape, int row, int col);
+
+        // to move the shapes to left, right and down based on the key press on keyboard
         void moveShape(Shape *shape, string position);
+
+        // rotate the shape on press on pgup key
         void rotateShape(Shape *shape);
+
+        // render shape and dispaly on board
         void renderShape(Shape currShape, SDL_Renderer *renderer);
+
+        // render the next droping shape and display on board
         void renderNextShape(Shape nextShape, SDL_Renderer *renderer);
+
+        // when shape gets collied with board or with othershape, save the same in that location of the board 
         void saveShape(Gamedata *data, Shape currShape, SDL_Renderer *renderer, int &score); 
         
 };
-
-/* bool shape1[4][4] = {0, 0, 1, 0,          // L
-                     1, 1, 1, 0,
-                     0, 0, 0, 0,
-                     0, 0, 0, 0};
-
-bool shape2[4][4] = {1, 1, 0, 0,          // Z
-                     0, 1, 1, 0,
-                     0, 0, 0, 0,
-                     0, 0, 0, 0};
-
-bool shape3[4][4] = {1, 1, 1, 1,          // I
-                     0, 0, 0, 0,
-                     0, 0, 0, 0,
-                     0, 0, 0, 0};
-
-bool shape4[4][4] = {1, 0, 0, 0,          // J
-                     1, 1, 1, 0,
-                     0, 0, 0, 0,
-                     0, 0, 0, 0};
-
-bool shape5[4][4] = {1, 1, 0, 0,          // 0
-                     1, 1, 0, 0,
-                     0, 0, 0, 0,
-                     0, 0, 0, 0};
-
-bool shape6[4][4] = {0, 1, 1, 0,          // S
-                     1, 1, 0, 0,
-                     0, 0, 0, 0,
-                     0, 0, 0, 0};
-
-bool shape7[4][4] =  {0, 1, 0, 0,         // T
-                      1, 1, 1, 0,
-                      0, 0, 0, 0,
-                      0, 0, 0, 0};
-
-
-Shape _shapes[7] = { Shape(SDL_Color{255, 0, 0},shape1,0,0,3) ,
-                     Shape(SDL_Color{0, 255, 0},shape2,0,0,3) ,
-                     Shape(SDL_Color{0, 0, 255},shape3,0,0,4) ,
-                     Shape(SDL_Color{255, 255, 0},shape4,0,0,3) ,
-                     Shape(SDL_Color{0, 255, 255},shape5,0,0,3) ,
-                     Shape(SDL_Color{255, 0, 255},shape6,0,0,3) ,
-                     Shape(SDL_Color{255, 255, 255},shape7,0,0,3) }; */
-
-    
-    
-    
-    
     
     
 
