@@ -1,3 +1,4 @@
+
 #include "board.hpp"
 
 /// Default constructor
