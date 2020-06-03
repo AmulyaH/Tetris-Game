@@ -10,11 +10,15 @@
                 //"${file}",
                /*  "${workspaceFolder}/tetromino.cpp",
                 "${workspaceFolder}/well.cpp",
-                "${workspaceFolder}/game.cpp", */
-                "${workspaceFolder}/main.cpp",
+                 */
+
+                //"${workspaceFolder}/game.cpp",
+                "${workspaceFolder}/game.cpp",
                 "${workspaceFolder}/board.cpp",
                 "${workspaceFolder}/shape.cpp",
-                "${workspaceFolder}/game.cpp",
+                
+                "${workspaceFolder}/main.cpp",
+                
                 "-o",
 				"${fileDirname}/${fileBasenameNoExtension}",
 				"-lSDL2",

@@ -1,12 +1,22 @@
 
 #include "shape.hpp"
 #include <string>
-#include<iostream>
+#include <iostream>
 
 using namespace std;
 
 Shape::Shape(SDL_Color color, bool matrix[4][4], double x, double y, int size): 
-                            _color{color}, _matrix{matrix}, _x{x},  _y{y},  _size{size}{}
+                            _color{color}, _matrix{matrix}, _x{x},  _y{y},  _size{size}{
+                                for (int row = 0; row < 4; row++)
+                                {
+                                    for (int col = 0; col < 4; col++)
+                                    {
+                                        _matrix[row][col] = matrix[row][col];
+                                    }
+                                    
+                                }
+                                
+                            };
 
 
 bool Shape::isBlock(Shape currShape, int x , int y)
@@ -14,7 +24,7 @@ bool Shape::isBlock(Shape currShape, int x , int y)
     return currShape._matrix[x][y];
 }
 
-void moveShape(Shape *currShape, string position)
+void Shape::moveShape(Shape *currShape, string position)
 {
     if (position == "down")
         currShape->_y++;
@@ -26,7 +36,7 @@ void moveShape(Shape *currShape, string position)
         currShape->_x++;
 }
 
- void rotateShape(Shape *currShape)
+ void Shape::rotateShape(Shape *currShape)
  {
     Shape temp = *currShape;
     for (int i = 0; i < temp._size; i++)
@@ -49,7 +59,7 @@ void moveShape(Shape *currShape, string position)
     }
  }
 
- void renderShape(Shape currShape, SDL_Renderer *renderer)
+ void Shape::renderShape(Shape currShape, SDL_Renderer *renderer)
  {
      SDL_Rect rect;
      for (int i = 0; i < currShape._size; i++)
@@ -71,7 +81,7 @@ void moveShape(Shape *currShape, string position)
     }
  }
 
- void renderNextShape(Shape nextShape, SDL_Renderer *renderer)
+ void Shape::renderNextShape(Shape nextShape, SDL_Renderer *renderer)
  {
      SDL_Rect rect;
      for (int i = 0; i < nextShape._size; i++)
@@ -94,7 +104,7 @@ void moveShape(Shape *currShape, string position)
     }
  }
 
- void saveShape(Gamedata *data, Shape current_shape, SDL_Renderer *renderer, int *score)
+ void Shape::saveShape(Gamedata *data, Shape current_shape, SDL_Renderer *renderer, int &score)
  {
      for (auto x = 0; x < current_shape._size; ++x)
     {
@@ -130,3 +140,5 @@ void moveShape(Shape *currShape, string position)
         }
     }
  }
+
+ 

@@ -1,36 +1,42 @@
 #pragma once
 #include "SDL2/SDL.h"
 #include <SDL2/SDL_ttf.h>
+#include <string>
+#include "board.hpp"
+//#include "game.hpp"
+/*
 #include <iostream>
 #include <vector>
-#include <string>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "board.hpp"
-#include "game.hpp"
+ */
 
 using namespace std;
 
 class Shape
 {
-    public:
+     public:
         SDL_Color _color;
         bool _matrix[4][4];
         double _x, _y;
         int _size;
 
+
     public:
-        Shape();
+        Shape() = default;
         Shape(SDL_Color _col, bool _mat[4][4], double x, double y, int size);
         bool isBlock(Shape shape, int x, int y);
         void moveShape(Shape *shape, string position);
         void rotateShape(Shape *shape);
         void renderShape(Shape currShape, SDL_Renderer *renderer);
         void renderNextShape(Shape nextShape, SDL_Renderer *renderer);
-        void saveShape(Gamedata *data, Shape currShape, SDL_Renderer *renderer, int &score);
+        void saveShape(Gamedata *data, Shape currShape, SDL_Renderer *renderer, int &score); 
+        
 };
 
-bool shape1[4][4] = {0, 0, 1, 0,          // L
+/* bool shape1[4][4] = {0, 0, 1, 0,          // L
                      1, 1, 1, 0,
                      0, 0, 0, 0,
                      0, 0, 0, 0};
@@ -72,7 +78,7 @@ Shape _shapes[7] = { Shape(SDL_Color{255, 0, 0},shape1,0,0,3) ,
                      Shape(SDL_Color{255, 255, 0},shape4,0,0,3) ,
                      Shape(SDL_Color{0, 255, 255},shape5,0,0,3) ,
                      Shape(SDL_Color{255, 0, 255},shape6,0,0,3) ,
-                     Shape(SDL_Color{255, 255, 255},shape7,0,0,3) }
+                     Shape(SDL_Color{255, 255, 255},shape7,0,0,3) }; */
 
     
     

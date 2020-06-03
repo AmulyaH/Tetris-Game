@@ -1,23 +1,27 @@
 //#pragma once
+
 #include "game.hpp"
-#include "shape.hpp"
-#include "board.hpp"
 #include <iostream>
 
 using namespace std;
 
 Game::Game()
 {
-    //Gamedata _data = {};
+    
 
-    _currentTimeTick = SDL_GetTicks();
-    _lastTimeTick = 0;
+    //_currentTimeTick = SDL_GetTicks();
+    //_lastTimeTick = 0;
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         cerr << "Unable to initialize SDL:" << SDL_GetError() << endl;
     }
+
+    if (TTF_Init() == -1)
+        {
+            cerr << "Error ." << endl;
+        }
 
     _window = SDL_CreateWindow("Tetris",
                                SDL_WINDOWPOS_CENTERED,
@@ -30,19 +34,68 @@ Game::Game()
                                    -1,
                                    SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    _currentShape = _shapes[rand() % 7];
-    _nextShape = _shapes[rand() % 7];
+    Gamedata _data = initializeGame();
 }
 
-void Game::initializeGame()
+void Game::createShapes()
 {
+    bool shape1[4][4] = {0, 0, 1, 0, // L
+                         1, 1, 1, 0,
+                         0, 0, 0, 0,
+                         0, 0, 0, 0};
+
+    bool shape2[4][4] = {1, 1, 0, 0, // Z
+                         0, 1, 1, 0,
+                         0, 0, 0, 0,
+                         0, 0, 0, 0};
+
+    bool shape3[4][4] = {1, 1, 1, 1, // I
+                         0, 0, 0, 0,
+                         0, 0, 0, 0,
+                         0, 0, 0, 0};
+
+    bool shape4[4][4] = {1, 0, 0, 0, // J
+                         1, 1, 1, 0,
+                         0, 0, 0, 0,
+                         0, 0, 0, 0};
+
+    bool shape5[4][4] = {1, 1, 0, 0, // 0
+                         1, 1, 0, 0,
+                         0, 0, 0, 0,
+                         0, 0, 0, 0};
+
+    bool shape6[4][4] = {0, 1, 1, 0, // S
+                         1, 1, 0, 0,
+                         0, 0, 0, 0,
+                         0, 0, 0, 0};
+
+    bool shape7[4][4] = {0, 1, 0, 0, // T
+                         1, 1, 1, 0,
+                         0, 0, 0, 0,
+                         0, 0, 0, 0};
+
+    _shapes.push_back(Shape(SDL_Color{255, 0, 0}, shape1, 0, 0, 3));
+    _shapes.push_back(Shape(SDL_Color{0, 255, 0}, shape2, 0, 0, 3));
+    _shapes.push_back(Shape(SDL_Color{0, 0, 255}, shape3, 0, 0, 4));
+    _shapes.push_back(Shape(SDL_Color{255, 255, 0}, shape4, 0, 0, 3));
+    _shapes.push_back(Shape(SDL_Color{0, 255, 255}, shape5, 0, 0, 3));
+    _shapes.push_back(Shape(SDL_Color{255, 0, 255}, shape6, 0, 0, 3));
+    _shapes.push_back(Shape(SDL_Color{255, 255, 255}, shape7, 0, 0, 3));
+}
+
+Gamedata Game::initializeGame()
+{
+    createShapes();
     _level = 1;
     _score = 0;
     _isGameOver = false;
-    //Gamedata _data = {};
+    Gamedata _data = {};
+    _currentShape = _shapes[rand() % 7];
+    _nextShape = _shapes[rand() % 7];
+    return _data;
 }
 
-bool isCollision(BoardValue board, Shape current_shape)
+bool Game::isCollision(Gamedata data, Shape current_shape)
 {
     for (int x = 0; x < current_shape._size; ++x)
     {
@@ -56,7 +109,7 @@ bool isCollision(BoardValue board, Shape current_shape)
                 {
                     return true;
                 }
-                if (board[wy][wx])
+                if (data.board[wy][wx].isFilled)
                 {
                     return true;
                 }
@@ -66,10 +119,11 @@ bool isCollision(BoardValue board, Shape current_shape)
     return false;
 }
 
-void renderText(SDL_Renderer *renderer, const char *text, int x, int y, int width, int height, SDL_Color color)
+void Game::renderText(SDL_Renderer *renderer, const char *text, int x, int y, int width, int height, SDL_Color color)
 {
+    
     TTF_Font *font;
-    font = TTF_OpenFont("open-sans/OpenSans-Italic.ttf", 24); //this opens a font style and sets a size
+    font = TTF_OpenFont("OpenSans-Italic.ttf", 20); //this opens a font style and sets a size
 
     SDL_Color White = {255, 255, 255}; // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
 
@@ -86,7 +140,7 @@ void renderText(SDL_Renderer *renderer, const char *text, int x, int y, int widt
     SDL_Rect Message_rect;    //create a rect
     Message_rect.x = x * DIM; //controls the rect's x coordinate
     Message_rect.y = y * DIM; // controls the rect's y coordinte
-    Message_rect.w = width;   // controls the width of the rect
+    Message_rect.w = width - 2;   // controls the width of the rect
     Message_rect.h = height;  // controls the height of the rect
 
     //Mind you that (0,0) is on the top left of the window/screen, think a rect as the text's box, that way it would be very simple to understand
@@ -95,38 +149,29 @@ void renderText(SDL_Renderer *renderer, const char *text, int x, int y, int widt
 
     SDL_RenderCopy(renderer, Message, NULL, &Message_rect); //you put the renderer's name first, the Message, the crop size(you can ignore this if you don't want to dabble with cropping), and the rect which is the size and coordinate of your texture
 
-    //Don't forget to free your surface and texture
+    //freeing thes surface and texture
     SDL_FreeSurface(surfaceMessage);
     SDL_DestroyTexture(Message);
 }
 
-void renderScore(SDL_Renderer *renderer, int score)
+void Game::renderScore(SDL_Renderer *renderer, int score)
 {
     SDL_Color White = {255, 255, 255, 255};
-    //SDL_Color Red = {255, 0,0,255};
     string gameScore = "Score : " + to_string(score);
-    renderText(renderer, gameScore.c_str(), 11, 3, (7 * DIM), 60, White);
+    renderText(renderer, gameScore.c_str(), 11, 3, (5 * DIM), 60, White);
 }
 
-void renderLevel(SDL_Renderer *renderer, int level)
+void Game::renderLevel(SDL_Renderer *renderer, int level)
 {
     SDL_Color White = {255, 255, 255, 255};
-    //SDL_Color Red = {255, 0,0,255};
-    string gameLevel = "Score : " + to_string(level);
-    renderText(renderer, gameLevel.c_str(), 11, 3, (7 * DIM), 60, White);
+    string gameLevel = "Level : " + to_string(level);
+    renderText(renderer, gameLevel.c_str(), 11, 5, (5 * DIM), 60, White);
 }
 
 bool Game::gameRunning()
 {
 
     SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-        if (event.type == SDL_QUIT)
-        {
-            return false;
-        }
-    }
 
     if (SDL_WaitEventTimeout(&event, 250))
     {
@@ -137,41 +182,39 @@ bool Game::gameRunning()
         {
             switch (event.key.keysym.sym)
             {
-
             case SDLK_DOWN:
             {
                 temp.moveShape(&temp, "down");
                 if (!isCollision(_data, temp))
                 {
-                    temp.moveShape(&_currentShape, "down");
+                    _currentShape = temp;
                 }
             }
             break;
             case SDLK_RIGHT:
             {
-                //Shape temp = _currentShape;
                 temp.moveShape(&temp, "right");
                 if (!isCollision(_data, temp))
                 {
-                    temp.moveShape(&_currentShape, "right");
+                    _currentShape = temp;
                 }
             }
             break;
             case SDLK_LEFT:
             {
-                //Shape temp = _currentShape;
                 temp.moveShape(&temp, "left");
                 if (!isCollision(_data, temp))
                 {
-                    temp.moveShape(&_currentShape, "left");
+                    _currentShape = temp;
                 }
             }
             break;
             case SDLK_UP:
             {
-                if (!isCollision(_data, _currentShape))
+                temp.rotateShape(&temp);
+                if (!isCollision(_data, temp))
                 {
-                    temp.rotateShape(&_currentShape);
+                    _currentShape = temp;
                 }
             }
             break;
@@ -189,10 +232,15 @@ bool Game::gameRunning()
             break;
             case SDLK_RETURN:
             {
-                initializeGame();
+                _data = initializeGame();
             }
             break;
+            case SDLK_ESCAPE:
+            {
+                return false;
             }
+            }
+            
         }
         break;
         case SDL_QUIT:
@@ -213,13 +261,16 @@ bool Game::gameRunning()
 
         renderScore(_renderer, _score);
 
-        rencderLevel(_renderer, _level);
+        renderLevel(_renderer, _level);
 
+        string nextShape = "Next Shape :";
+        renderText(_renderer, nextShape.c_str(), 11, 9, (8 * DIM), 60, {255, 255, 255, 255});
         _nextShape.renderNextShape(_nextShape, _renderer);
 
-        // _currentTimeTick = SDL_GetTicks();
+        _currentTimeTick = SDL_GetTicks();
         if (_currentTimeTick > _lastTimeTick)
         {
+
             if (_score > 500)
             {
                 _lastTimeTick = _currentTimeTick + 500;
@@ -240,55 +291,52 @@ bool Game::gameRunning()
                 _lastTimeTick = _currentTimeTick + 800;
                 _level = 2;
             }
-            else
+            else if (_score < 100)
             {
                 _lastTimeTick = _currentTimeTick + 1000;
                 _level = 1;
             }
-        }
 
-        Shape t = _currentShape;
-        t.moveShape(&t, "down");
+            Shape temp = _currentShape;
+            temp.moveShape(&temp, "down");
 
-        if (isCollision(_data, t))
-        {
-            t.saveShape(&_data, _currentShape, _renderer, _score);
-            _currentShape = _nextShape;
-            _nextShape = _shapes[rand() % 7];
-
-            if (isCollision(_data, _currentShape))
+            if (isCollision(_data, temp))
             {
-                SDL_Color Red = {255, 0, 0};
-                //gameOverRender(renderer);
-                renderText(_renderer, "Game Over!", 1, 5, (9 * DIM), 60, Red);
-                renderText(_renderer, "Press Enter to start new game", 1, 7, (9 * DIM), 60, Red);
-                renderText(_renderer, "Press any key to exit", 1, 9, (9 * DIM), 60, Red);
-                _isGameOver = true;
-                if (SDL_WaitEventTimeout(&event, 250))
+                temp.saveShape(&_data, _currentShape, _renderer, _score);
+                _currentShape = _nextShape;
+                _nextShape = _shapes[rand() % 7];
+
+                if (isCollision(_data, _currentShape))
                 {
-                    switch (event.type)
+                    SDL_Color Red = {255, 0, 0};
+                    renderText(_renderer, "Game Over!", 1, 5, (9 * DIM), 60, Red);
+                    renderText(_renderer, "Press Enter to start new game", 1, 7, (9 * DIM), 60, Red);
+                    renderText(_renderer, "Press Escape to exit", 1, 9, (9 * DIM), 60, Red);
+                    _isGameOver = true;
+                    if (SDL_WaitEventTimeout(&event, 250))
                     {
-                    case SDL_KEYDOWN:
-                    {
-                        switch (event.key.keysym.sym)
+                        switch (event.type)
                         {
-                        case SDLK_RETURN:
+                        case SDL_KEYDOWN:
                         {
-                            //gameTime = 0;
-                            _isGameOver = true;
-                            _data = initializeGame();
+                            switch (event.key.keysym.sym)
+                            {
+                            case SDLK_RETURN:
+                            {
+                                _isGameOver = true;
+                            }
+                            break;
+                            }
+                            break;
                         }
-                        break;
                         }
-                        break;
-                    }
                     }
                 }
             }
-        }
-        else
-        {
-            _currentShape = t;
+            else
+            {
+                _currentShape = temp;
+            }
         }
     }
     else if (!_isGameOver)
