@@ -121,15 +121,21 @@ bool Game::isCollision(Gamedata data, Shape current_shape)
 
 void Game::renderText(SDL_Renderer *renderer, const char *text, int x, int y, int width, int height, SDL_Color color)
 {
+    if (TTF_Init() == -1)
+        {
+            cerr << "Error ." << endl;
+        }
+
     
     TTF_Font *font;
-    font = TTF_OpenFont("OpenSans-Italic.ttf", 20); //this opens a font style and sets a size
+    font = TTF_OpenFont("OpenSans-Regular.ttf", 20); //this opens a font style and sets a size
 
     SDL_Color White = {255, 255, 255}; // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
 
     if (!font)
     {
         cout << "TTF_OpenFont: " << TTF_GetError() << "\n";
+        //font = TTF_OpenFont("OpenSans-Italic.ttf", 20);
     }
 
     SDL_Surface *surfaceMessage;
